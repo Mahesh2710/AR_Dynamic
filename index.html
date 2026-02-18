@@ -189,6 +189,7 @@
 
             document.querySelector('#target-entity').addEventListener('targetFound', () => {
                 hasFoundOnce = true;
+                isStickyEnabled = true;
                 scannerUi.style.display = 'none';
                 videoContainer.style.display = 'none';
                 buyNowBtn.style.display = 'block';
