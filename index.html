@@ -121,7 +121,7 @@
                 const config = data.find(item => item.id === targetId);
                 if (!config) return;
 
-                // 1. Dynamic UI Population
+                // --- Dynamic Logic Start ---
                 document.getElementById('campaign-title').innerText = `Play ${config.campaignName}`;
                 document.getElementById('welcome-page').style.backgroundImage = `url('${config.welcomePoster}')`;
                 document.getElementById('dynamic-scanner-img').src = config.scannerImg;
@@ -129,11 +129,9 @@
                 document.getElementById('buy-now-cta').href = config.CTAredirectUrl;
                 document.getElementById('buy-now-cta').style.backgroundImage = `url('${config.CTAimgUrl}')`;
                 
-                // 2. Video Source Initialization
                 video.src = config.videoUrl;
                 video.load();
 
-                // 3. Set MindAR with Stability Filters (filterMinCF and filterBeta)
                 sceneEl.setAttribute('mindar-image', `
                     imageTargetSrc: ${config.mindUrl}; 
                     autoStart: false; 
@@ -143,6 +141,7 @@
                     missTolerance: 1000; 
                     warmupTolerance: 5;
                 `);
+                // --- Dynamic Logic End ---
                 
                 sceneEl.style.display = "block";
                 setTimeout(() => {
@@ -152,15 +151,11 @@
             } catch (e) { console.error("Config load error:", e); }
         }
 
-        // --- iOS Fix: User Gesture Unlock ---
         playBtn.addEventListener('click', () => {
-            // iOS Unlock
             video.play(); 
             video.pause();
-
             document.querySelector('#welcome-page').style.display = 'none';
             document.querySelector('#scanner-ui').style.display = 'flex';
-            
             if (sceneEl.hasLoaded) {
                 sceneEl.systems["mindar-image-system"].start();
             } else {
@@ -174,10 +169,8 @@
             document.querySelector('#scanner-ui').style.display = 'none';
             document.querySelector('#video-container').style.display = 'none';
             document.querySelector('#buy-now-cta').style.display = 'block';
-            
             document.getElementById('asset-container').appendChild(video);
             document.querySelector('#ar-video-renderer').setAttribute('visible', 'true');
-            
             video.play().catch(() => {
                 video.muted = true;
                 video.play();
