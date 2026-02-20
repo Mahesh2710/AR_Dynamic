@@ -14,7 +14,7 @@
 
         #welcome-page {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 100; background: #1a1a1a center/cover;
+            z-index: 100; background: #1a1a1a center/cover no-repeat;
             display: flex; align-items: flex-end;
         }
 
@@ -22,7 +22,7 @@
             width: 100%; height: 50%; border-radius: 40px 40px 0 0; position: relative;
             display: flex; flex-direction: column; overflow: hidden;
             box-shadow: 0 -15px 35px rgba(0,0,0,0.6);
-            background: #121212 center/cover;
+            background: #121212;
             transform: translateY(100%);
             animation: slideUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
@@ -41,13 +41,13 @@
 
         #scanner-ui { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 50; pointer-events: none; }
         .scanner-frame { width: 75vw; height: 75vw; position: relative; display: flex; justify-content: center; align-items: center; }
-        .scanner-img { width: 70%; opacity: 0.4; }
+        .scanner-img { width: 70%; opacity: 0.6; }
         .scanner-line { position: absolute; width: 100%; height: 4px; background: #a3ff00; top: 0; animation: scan 2s linear infinite; }
         
         #video-container { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; z-index: 40; display: none; flex-direction: column; align-items: center; }
         #video-wrapper { position: relative; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.8); border-radius: 20px; }
         #video-container video { width: 100%; border: 3px solid #FFF; border-radius: 20px; display: block; }
-        #close-sticky { position: absolute; top: -15px; right: -15px; width: 40px; height: 40px; background: #ff3b30; color: white; border-radius: 50%; border: 2px solid white; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+        #close-sticky { position: absolute; top: -15px; right: -15px; width: 40px; height: 40px; background: #ff3b30; color: white; border-radius: 50%; border: 2px solid white; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; z-index: 45; }
 
         #buy-now-cta { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 280px; height: 70px; display: none; z-index: 60; background: center/contain no-repeat; }
 
@@ -80,7 +80,9 @@
     </div>
 
     <div id="video-container">
-        <div id="video-wrapper"><button id="close-sticky">×</button></div>
+        <div id="video-wrapper">
+            <button id="close-sticky">×</button>
+            </div>
     </div>
 
     <a href="#" target="_blank" id="buy-now-cta"></a>
@@ -113,25 +115,35 @@
 
         async function init() {
             const params = new URLSearchParams(window.location.search);
-            const targetId = params.get('id') || "1";
+            const targetId = params.get('id') || "1"; // Default to 1 if no id in URL
 
             try {
                 const response = await fetch(API_URL);
                 const data = await response.json();
+                
+                // Find the specific object based on the URL 'id'
                 const config = data.find(item => item.id === targetId);
-                if (!config) return;
+                
+                if (!config) {
+                    document.getElementById('campaign-title').innerText = "Campaign Not Found";
+                    return;
+                }
 
-                // --- Dynamic Logic Start ---
+                // 1. Dynamic UI Population from JSON
                 document.getElementById('campaign-title').innerText = `Play ${config.campaignName}`;
-                document.getElementById('welcome-page').style.backgroundImage = `url('${config.welcomePoster}')`;
+                // Using scannerImg as background for welcome-page as fallback if welcomePoster is missing in your new JSON
+                document.getElementById('welcome-page').style.backgroundImage = `url('${config.scannerImg}')`;
                 document.getElementById('dynamic-scanner-img').src = config.scannerImg;
                 document.getElementById('campaign-3d-text').setAttribute('value', config.campaignName.toUpperCase());
+                
                 document.getElementById('buy-now-cta').href = config.CTAredirectUrl;
                 document.getElementById('buy-now-cta').style.backgroundImage = `url('${config.CTAimgUrl}')`;
                 
+                // 2. Video Source Initialization
                 video.src = config.videoUrl;
                 video.load();
 
+                // 3. Set MindAR with the dynamic .mind file from JSON
                 sceneEl.setAttribute('mindar-image', `
                     imageTargetSrc: ${config.mindUrl}; 
                     autoStart: false; 
@@ -141,21 +153,27 @@
                     missTolerance: 1000; 
                     warmupTolerance: 5;
                 `);
-                // --- Dynamic Logic End ---
                 
                 sceneEl.style.display = "block";
                 setTimeout(() => {
                     playBtn.style.display = 'flex';
                     playBtn.style.animation = 'fadeInRight 0.5s ease forwards';
                 }, 900);
-            } catch (e) { console.error("Config load error:", e); }
+
+            } catch (e) { 
+                console.error("Config load error:", e); 
+                document.getElementById('campaign-title').innerText = "Error Loading Data";
+            }
         }
 
+        // --- Logic Handlers (Unchanged) ---
         playBtn.addEventListener('click', () => {
             video.play(); 
-            video.pause();
+            video.pause(); // Unlock audio for iOS
+
             document.querySelector('#welcome-page').style.display = 'none';
             document.querySelector('#scanner-ui').style.display = 'flex';
+            
             if (sceneEl.hasLoaded) {
                 sceneEl.systems["mindar-image-system"].start();
             } else {
@@ -169,8 +187,11 @@
             document.querySelector('#scanner-ui').style.display = 'none';
             document.querySelector('#video-container').style.display = 'none';
             document.querySelector('#buy-now-cta').style.display = 'block';
+            
+            // Move video back to AR scene
             document.getElementById('asset-container').appendChild(video);
             document.querySelector('#ar-video-renderer').setAttribute('visible', 'true');
+            
             video.play().catch(() => {
                 video.muted = true;
                 video.play();
