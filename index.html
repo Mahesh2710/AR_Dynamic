@@ -132,7 +132,7 @@
                 // 1. Dynamic UI Population from JSON
                 document.getElementById('campaign-title').innerText = `Play ${config.campaignName}`;
                 // Using scannerImg as background for welcome-page as fallback if welcomePoster is missing in your new JSON
-                document.getElementById('welcome-page').style.backgroundImage = `url('${config.scannerImg}')`;
+                document.getElementById('welcome-page').style.backgroundImage = `url('${config.welcomePoster}')`;
                 document.getElementById('dynamic-scanner-img').src = config.scannerImg;
                 document.getElementById('campaign-3d-text').setAttribute('value', config.campaignName.toUpperCase());
                 
