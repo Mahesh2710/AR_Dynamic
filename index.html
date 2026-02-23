@@ -19,7 +19,8 @@
 
         #welcome-page {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 100; background: #1a1a1a center/cover;
+            z-index: 100;
+            background: #121212 url('https://raw.githubusercontent.com/Mahesh2710/ARData/main/DynamicData/poster/welcomeposter.png') center/cover;
             display: flex; align-items: flex-end;
         }
 
@@ -27,7 +28,7 @@
             width: 100%; height: 50%; border-radius: 40px 40px 0 0; position: relative;
             display: flex; flex-direction: column; overflow: hidden;
             box-shadow: 0 -15px 35px rgba(0,0,0,0.6);
-            background: #121212 url('https://mahesh2710.github.io/ARData/target/welcome.jpg') center/cover;
+            background: #121212 url('https://mahesh2710.github.io/ARData/DynamicData/poster/welcome.png') center/cover;
             transform: translateY(100%);
             animation: slideUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
@@ -132,7 +133,7 @@
 
                 // Dynamic UI Population
                 document.getElementById('campaign-title').innerText = `Play ${config.campaignName}`;
-                document.getElementById('welcome-page').style.backgroundImage = `url('${config.welcomePoster}?v=${cacheBust}')`;
+                // document.getElementById('welcome-page').style.backgroundImage = `url('${config.welcomePoster}?v=${cacheBust}')`;
                 document.getElementById('dynamic-scanner-img').src = `${config.scannerImg}?v=${cacheBust}`;
                 document.getElementById('campaign-3d-text').setAttribute('value', config.campaignName.toUpperCase());
                 document.getElementById('buy-now-cta').href = config.CTAredirectUrl;
