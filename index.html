@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>Fixed AR Experience</title>
+    <title>AR Experience Fixed</title>
     
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
@@ -33,7 +33,7 @@
 
         #play-button {
             width: 100px; height: 45px; background: #4185f4; border: none;
-            border-radius: 20px; color: white; font-weight: bold; display: none;
+            border-radius: 20px; color: white; font-weight: bold; display: none; cursor: pointer;
         }
 
         #scanner-ui {
@@ -57,9 +57,7 @@
     <div id="welcome-page">
         <div id="bottom-sheet">
             <div id="sheet-footer">
-                <div style="color: white;">
-                    <h2 id="campaign-title" style="margin:0; font-size: 1.1rem;">Loading...</h2>
-                </div>
+                <div style="color: white;"><h2 id="campaign-title" style="margin:0; font-size: 1.1rem;">Loading...</h2></div>
                 <button id="play-button">Play</button>
             </div>
         </div>
@@ -73,32 +71,42 @@
 
     <div id="video-container">
         <div id="video-wrapper" style="position:relative;">
-            <button id="close-sticky" style="position:absolute; top:-10px; right:-10px; z-index:200; background:red; color:white; border-radius:50%; width:30px; height:30px;">X</button>
+            <button id="close-sticky" style="position:absolute; top:-10px; right:-10px; z-index:200; background:red; color:white; border-radius:50%; width:30px; height:30px; border:none; cursor:pointer;">X</button>
         </div>
     </div>
 
-    <a-scene 
-        mindar-image="autoStart: false; uiScanning: #none;" 
-        embedded color-management="true" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+    <a-scene mindar-image="autoStart: false; uiScanning: #none;" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
         
         <a-assets>
             <video id="myVideo" loop="true" crossorigin="anonymous" playsinline preload="auto"></video>
         </a-assets>
 
-        <a-camera position="0 0 0" look-controls="enabled: false">
+        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+        <a-entity mindar-image-target="targetIndex: 0" id="target-entity">
             <a-video 
                 id="ar-video-renderer" 
                 src="#myVideo" 
                 visible="false"
-                position="0 0 -1"
-                scale="1 1 1">
+                absolute-screen-lock>
             </a-video>
-        </a-camera>
-
-        <a-entity mindar-image-target="targetIndex: 0" id="target-entity"></a-entity>
+        </a-entity>
     </a-scene>
 
     <script>
+        // The core component to stop resizing and rotating
+        AFRAME.registerComponent('absolute-screen-lock', {
+            tick: function () {
+                const obj = this.el.object3D;
+                // Force rotation to be perfectly flat
+                obj.quaternion.set(0, 0, 0, 1);
+                // Force scale to be consistent regardless of camera focus/distance
+                obj.scale.set(1, 1, 1);
+                // Force position to stay centered on the image
+                obj.position.set(0, 0, 0.1);
+            }
+        });
+
         const API_URL = "https://jsonmap.com/api/mock/artest";
         const video = document.querySelector('#myVideo');
         const arVideoRenderer = document.querySelector('#ar-video-renderer');
@@ -119,9 +127,9 @@
 
                 video.onloadedmetadata = () => {
                     const aspect = video.videoWidth / video.videoHeight;
-                    // We use a fixed scale relative to the camera view
-                    arVideoRenderer.setAttribute('width', aspect);
-                    arVideoRenderer.setAttribute('height', 1);
+                    // Maintain aspect ratio without engine distortion
+                    arVideoRenderer.setAttribute('width', 2.1 * aspect);
+                    arVideoRenderer.setAttribute('height', 2.1);
                 };
 
                 document.querySelector('#campaign-title').innerText = campaign.campaignName;
@@ -133,6 +141,10 @@
         document.querySelector('#play-button').addEventListener('click', () => {
             document.querySelector('#welcome-page').style.display = 'none';
             document.querySelector('#scanner-ui').style.display = 'flex';
+            
+            // Critical: Play/Pause to unlock video for mobile browsers
+            video.play().then(() => video.pause());
+
             const arSystem = sceneEl.systems["mindar-image-system"];
             arSystem.start();
         });
@@ -142,6 +154,12 @@
             isSticky = true;
             document.querySelector('#scanner-ui').style.display = 'none';
             document.querySelector('#video-container').style.display = 'none';
+            
+            // Move video back to assets to ensure AR plane can use it
+            if(video.parentElement !== document.querySelector('a-assets')) {
+                document.querySelector('a-assets').appendChild(video);
+            }
+
             arVideoRenderer.setAttribute('visible', 'true');
             video.play();
         });
