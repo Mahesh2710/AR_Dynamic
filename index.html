@@ -2,59 +2,38 @@
 <html lang="en">
 <head>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>Dynamic AR Experience - Absolute Front Facing</title>
+    <title>Fixed AR Experience</title>
     
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     
     <style>
-        body, html { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            overflow: hidden; font-family: 'Segoe UI', sans-serif; 
-            background-color: #000;
-        }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #000; }
         .a-enter-vr, .a-enter-ar { display: none !important; }
 
         #welcome-page {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 100; 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; 
             background-image: url('https://raw.githubusercontent.com/Mahesh2710/ARData/main/DynamicData/poster/welcomeposter.png');
-            background-color: #1a1a1a; background-size: 100% 100%; background-position: center;
-            display: flex; align-items: flex-end;
+            background-size: 100% 100%; display: flex; align-items: flex-end;
         }
 
         #bottom-sheet {
-            width: 100%; height: 50%; border-radius: 40px 40px 0 0; position: relative;
-            display: flex; flex-direction: column; overflow: hidden;
-            box-shadow: 0 -15px 35px rgba(0,0,0,0.6);
+            width: 100%; height: 50%; border-radius: 40px 40px 0 0; 
             background-image: url('https://raw.githubusercontent.com/Mahesh2710/ARData/main/DynamicData/poster/welcome.png');
-            background-color: #121212; background-size: 100% 100%; background-position: center;
-            transform: translateY(100%);
+            background-size: 100% 100%; transform: translateY(100%);
             animation: slideUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-        }
-
-        #sheet-content {
-            flex: 1; padding: 40px 30px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 100%);
-            display: flex; flex-direction: column; justify-content: center;
+            display: flex; flex-direction: column;
         }
 
         #sheet-footer {
-            background: #000; padding: 20px 30px; display: flex;
+            margin-top: auto; background: #000; padding: 20px; display: flex;
             justify-content: space-between; align-items: center; border-top: 2px solid #FFF;
         }
 
-        .footer-text h2 { color: white; margin: 0; font-size: 1.2rem; }
-        .footer-text p { color: #888; margin: 5px 0 0 0; font-size: 0.9rem; }
-
         #play-button {
-            width: 110px; height: 50px; background: #4185f4; border: none;
-            border-radius: 25px; cursor: pointer; display: none;
-            justify-content: center; align-items: center; color: white; font-weight: bold;
+            width: 100px; height: 45px; background: #4185f4; border: none;
+            border-radius: 20px; color: white; font-weight: bold; display: none;
         }
 
         #scanner-ui {
@@ -62,51 +41,24 @@
             display: none; flex-direction: column; justify-content: center; align-items: center;
             z-index: 50; pointer-events: none;
         }
-        .scanner-frame { width: 75vw; height: 75vw; position: relative; display: flex; justify-content: center; align-items: center; }
-        .scanner-img { width: 70%; opacity: 0.6; }
-        .scanner-line { position: absolute; width: 100%; height: 4px; background: #a3ff00; top: 0; animation: scan 2s linear infinite; }
-        
+
         #video-container {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 85%; z-index: 40; display: none; 
-            flex-direction: column; justify-content: center; align-items: center;
+            width: 85%; z-index: 150; display: none;
         }
-        #video-wrapper { position: relative; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.8); border-radius: 20px; }
-        #video-container video { width: 100%; border: 3px solid #FFF; border-radius: 20px; display: block; }
-
-        #close-sticky {
-            position: absolute; top: -15px; right: -15px; width: 40px; height: 40px; 
-            background: #ff3b30; color: white; border-radius: 50%; border: 2px solid white;
-            font-size: 24px; font-weight: bold; cursor: pointer; z-index: 100;
-            display: flex; justify-content: center; align-items: center;
-        }
-
-        #buy-now-cta {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 280px; height: 70px; display: none; z-index: 60;
-            background-size: contain; background-repeat: no-repeat; background-position: center;
-        }
-
-        #error-screen {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #1a1a1a; z-index: 200; flex-direction: column; 
-            justify-content: center; align-items: center; color: white; text-align: center; padding: 20px;
-        }
+        #video-container video { width: 100%; border: 3px solid #FFF; border-radius: 20px; }
 
         @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
         @keyframes slideUp { to { transform: translateY(0); } }
-        @keyframes fadeInRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
     </style>
 </head>
 <body>
 
     <div id="welcome-page">
         <div id="bottom-sheet">
-            <div id="sheet-content"></div>
             <div id="sheet-footer">
-                <div class="footer-text">
-                    <h2 id="campaign-title">Checking Campaign...</h2>
-                    <p>Unlock the next level experience</p>
+                <div style="color: white;">
+                    <h2 id="campaign-title" style="margin:0; font-size: 1.1rem;">Loading...</h2>
                 </div>
                 <button id="play-button">Play</button>
             </div>
@@ -114,163 +66,104 @@
     </div>
 
     <div id="scanner-ui">
-        <div class="scanner-frame">
-            <img id="dynamic-scanner-img" src="" class="scanner-img">
-            <div class="scanner-line"></div>
+        <div style="width: 70vw; height: 70vw; border: 2px solid #a3ff00; position: relative;">
+            <div style="position: absolute; width: 100%; height: 4px; background: #a3ff00; animation: scan 2s linear infinite;"></div>
         </div>
-        <div style="color:white; margin-top:20px; font-weight:bold; text-shadow: 0 2px 4px #000;">SCAN THE PRODUCT</div>
     </div>
 
     <div id="video-container">
-        <div id="video-wrapper">
-            <button id="close-sticky">×</button>
+        <div id="video-wrapper" style="position:relative;">
+            <button id="close-sticky" style="position:absolute; top:-10px; right:-10px; z-index:200; background:red; color:white; border-radius:50%; width:30px; height:30px;">X</button>
         </div>
     </div>
 
-    <div id="error-screen">
-        <div style="font-size: 50px;">⚠️</div>
-        <h2 id="error-title">Campaign Not Found</h2>
-        <p id="error-msg">The link might be expired or incorrect.</p>
-        <button onclick="location.reload()" style="margin-top:20px; background:#4185f4; color:white;">Try Again</button>
-    </div>
-
-    <a href="#" target="_blank" id="buy-now-cta"></a>
-
     <a-scene 
-        id="ar-scene"
-        mindar-image="autoStart: false; uiScanning: #none; filterMinCF: 0.00001; filterBeta: 0.001; missTolerance: 10;" 
-        device-orientation-permission-ui="enabled: false"
-        vr-mode-ui="enabled: false"
-        renderer="antialias: true; colorManagement: true; logarithmicDepthBuffer: true;">
+        mindar-image="autoStart: false; uiScanning: #none;" 
+        embedded color-management="true" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
         
         <a-assets>
-            <video id="myVideo" loop="true" crossorigin="anonymous" playsinline webkit-playsinline preload="auto"></video>
+            <video id="myVideo" loop="true" crossorigin="anonymous" playsinline preload="auto"></video>
         </a-assets>
 
-        <a-camera position="0 0 0" look-controls="enabled: false" wasd-controls="enabled: false"></a-camera>
+        <a-camera position="0 0 0" look-controls="enabled: false">
+            <a-video 
+                id="ar-video-renderer" 
+                src="#myVideo" 
+                visible="false"
+                position="0 0 -1"
+                scale="1 1 1">
+            </a-video>
+        </a-camera>
 
-        <a-entity mindar-image-target="targetIndex: 0" id="target-entity">
-            <a-video id="ar-video-renderer" src="#myVideo" force-front-facing></a-video>
-        </a-entity>
+        <a-entity mindar-image-target="targetIndex: 0" id="target-entity"></a-entity>
     </a-scene>
 
     <script>
-        // ABSOLUTE LOCK: Prevents MindAR from scaling, rotating, or offsetting the video
-        AFRAME.registerComponent('force-front-facing', {
-            tick: function () {
-                // Stay flat against the camera lens
-                this.el.object3D.quaternion.set(0, 0, 0, 1);
-                
-                // Force fixed size (ignores distance from camera)
-                this.el.object3D.scale.set(1, 1, 1);
-
-                // Keep perfectly centered on the target anchor
-                this.el.object3D.position.set(0, 0, 0.1);
-            }
-        });
-
         const API_URL = "https://jsonmap.com/api/mock/artest";
-        
-        const playBtn = document.querySelector('#play-button');
-        const welcomePage = document.querySelector('#welcome-page');
-        const bottomSheet = document.querySelector('#bottom-sheet');
-        const scannerUi = document.querySelector('#scanner-ui');
-        const dynamicScannerImg = document.querySelector('#dynamic-scanner-img');
         const video = document.querySelector('#myVideo');
-        const videoContainer = document.querySelector('#video-container');
-        const videoWrapper = document.querySelector('#video-wrapper');
-        const sceneEl = document.querySelector('#ar-scene');
         const arVideoRenderer = document.querySelector('#ar-video-renderer');
-        const buyNowBtn = document.querySelector('#buy-now-cta');
-        const campaignTitle = document.querySelector('#campaign-title');
-        const errorScreen = document.querySelector('#error-screen');
+        const sceneEl = document.querySelector('a-scene');
+        const targetEntity = document.querySelector('#target-entity');
 
-        let isStickyEnabled = true;
-        let hasFoundOnce = false;
+        let isSticky = true;
+        let hasFound = false;
 
-        async function initCampaign() {
+        async function init() {
             try {
-                const urlParams = new URLSearchParams(window.location.search);
-                const targetId = urlParams.get('id');
-
-                const response = await fetch(API_URL);
-                const data = await response.json();
-                
-                let campaign = targetId ? data.find(item => item.id === targetId) : data.find(item => item.is_active === true);
-                if (!campaign) { errorScreen.style.display = 'flex'; return; }
+                const res = await fetch(API_URL);
+                const data = await res.json();
+                const campaign = data.find(i => i.is_active);
 
                 video.src = campaign.videoUrl;
                 video.load();
+
                 video.onloadedmetadata = () => {
                     const aspect = video.videoWidth / video.videoHeight;
-                    const baseHeight = 2.1;
-                    arVideoRenderer.setAttribute('width', baseHeight * aspect);
-                    arVideoRenderer.setAttribute('height', baseHeight);
+                    // We use a fixed scale relative to the camera view
+                    arVideoRenderer.setAttribute('width', aspect);
+                    arVideoRenderer.setAttribute('height', 1);
                 };
 
-                campaignTitle.innerText = `Ready for ${campaign.campaignName}?`;
-                dynamicScannerImg.src = campaign.scannerImg;
-                buyNowBtn.style.backgroundImage = `url('${campaign.CTAimgUrl}')`;
-                buyNowBtn.href = campaign.CTAredirectUrl;
-
-                sceneEl.setAttribute('mindar-image', {
-                    imageTargetSrc: campaign.mindUrl,
-                    autoStart: false,
-                    uiScanning: '#none'
-                });
-
-                setTimeout(() => { playBtn.style.display = 'flex'; }, 600);
-            } catch (err) { errorScreen.style.display = 'flex'; }
+                document.querySelector('#campaign-title').innerText = campaign.campaignName;
+                sceneEl.setAttribute('mindar-image', { imageTargetSrc: campaign.mindUrl, autoStart: false });
+                document.querySelector('#play-button').style.display = 'block';
+            } catch (e) { console.error(e); }
         }
 
-        window.addEventListener('load', initCampaign);
-
-        playBtn.addEventListener('click', () => {
-            document.body.style.backgroundColor = "transparent";
-            document.documentElement.style.backgroundColor = "transparent";
-            video.play().then(() => video.pause());
-            welcomePage.style.display = 'none';
-            scannerUi.style.display = 'flex';
-            const startAR = () => {
-                const arSystem = sceneEl.systems["mindar-image-system"];
-                if (arSystem) arSystem.start();
-            };
-            if (sceneEl.hasLoaded) startAR();
-            else sceneEl.addEventListener('render-target-loaded', startAR);
+        document.querySelector('#play-button').addEventListener('click', () => {
+            document.querySelector('#welcome-page').style.display = 'none';
+            document.querySelector('#scanner-ui').style.display = 'flex';
+            const arSystem = sceneEl.systems["mindar-image-system"];
+            arSystem.start();
         });
 
-        const targetEntity = document.querySelector('#target-entity');
-
         targetEntity.addEventListener('targetFound', () => {
-            hasFoundOnce = true;
-            isStickyEnabled = true;
-            scannerUi.style.display = 'none';
-            videoContainer.style.display = 'none';
-            buyNowBtn.style.display = 'block';
-            if(video.parentElement !== document.querySelector('a-assets')) {
-                document.querySelector('a-assets').appendChild(video);
-            }
+            hasFound = true;
+            isSticky = true;
+            document.querySelector('#scanner-ui').style.display = 'none';
+            document.querySelector('#video-container').style.display = 'none';
             arVideoRenderer.setAttribute('visible', 'true');
             video.play();
         });
 
         targetEntity.addEventListener('targetLost', () => {
-            if (hasFoundOnce && isStickyEnabled) {
-                arVideoRenderer.setAttribute('visible', 'false');
-                videoContainer.style.display = 'flex';
-                videoWrapper.appendChild(video);
+            arVideoRenderer.setAttribute('visible', 'false');
+            if (hasFound && isSticky) {
+                document.querySelector('#video-container').style.display = 'flex';
+                document.querySelector('#video-wrapper').appendChild(video);
                 video.play();
-            } else { video.pause(); }
+            }
         });
 
-        document.querySelector('#close-sticky').addEventListener('click', (e) => {
-            e.stopPropagation();
-            isStickyEnabled = false;
-            videoContainer.style.display = 'none';
-            scannerUi.style.display = 'flex';
+        document.querySelector('#close-sticky').addEventListener('click', () => {
+            isSticky = false;
+            document.querySelector('#video-container').style.display = 'none';
+            document.querySelector('#scanner-ui').style.display = 'flex';
             video.pause();
             document.querySelector('a-assets').appendChild(video);
         });
+
+        window.onload = init;
     </script>
 </body>
 </html>
