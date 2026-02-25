@@ -5,21 +5,14 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>Dynamic AR Experience - Fixed</title>
+    <title>Locked & Front-Facing AR</title>
     
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     
     <style>
-        /* Essential for AR Visibility */
-        body, html { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            overflow: hidden; font-family: 'Segoe UI', sans-serif; 
-            background-color: #000; /* Starts black, becomes transparent on play */
-        }
-        
-        /* Hide A-Frame default UI */
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', sans-serif; background: #000; }
         .a-enter-vr, .a-enter-ar { display: none !important; }
 
         /* Welcome Screen */
@@ -38,28 +31,18 @@
             animation: slideUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
 
-        #sheet-content {
-            flex: 1; padding: 40px 30px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.8) 100%);
-            display: flex; flex-direction: column; justify-content: center;
-        }
-
-        #sheet-footer {
-            background: #000; padding: 20px 30px; display: flex;
-            justify-content: space-between; align-items: center; border-top: 2px solid #FFF;
-        }
-
+        #sheet-content { flex: 1; padding: 40px 30px; display: flex; flex-direction: column; justify-content: center; background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.8) 100%); }
+        #sheet-footer { background: #000; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; border-top: 2px solid #FFF; }
         .footer-text h2 { color: white; margin: 0; font-size: 1.2rem; }
         .footer-text p { color: #888; margin: 5px 0 0 0; font-size: 0.9rem; }
 
         #play-button {
-            width: 110px; height: 50px; background: #4185f4; border: none;
-            border-radius: 25px; cursor: pointer; display: none;
-            justify-content: center; align-items: center; color: white; font-weight: bold;
-            box-shadow: 0 4px 15px rgba(65, 133, 244, 0.4);
+            width: 110px; height: 50px; background: #4185f4; border: none; border-radius: 25px; 
+            cursor: pointer; display: none; justify-content: center; align-items: center;
+            box-shadow: 0 4px 15px rgba(65, 133, 244, 0.4); color: white; font-weight: bold;
         }
 
-        /* Scanner Overlay */
+        /* AR UI */
         #scanner-ui {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             display: none; flex-direction: column; justify-content: center; align-items: center;
@@ -69,15 +52,13 @@
         .scanner-img { width: 70%; opacity: 0.6; }
         .scanner-line { position: absolute; width: 100%; height: 4px; background: #a3ff00; top: 0; animation: scan 2s linear infinite; }
         
-        /* Sticky Video UI */
+        /* Sticky Video */
         #video-container {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 85%; z-index: 40; display: none; 
-            flex-direction: column; justify-content: center; align-items: center;
+            width: 85%; z-index: 40; display: none; flex-direction: column; align-items: center;
         }
-        #video-wrapper { position: relative; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.8); border-radius: 20px; }
+        #video-wrapper { position: relative; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.8); border-radius: 20px; background: #000; }
         #video-container video { width: 100%; border: 3px solid #FFF; border-radius: 20px; display: block; }
-
         #close-sticky {
             position: absolute; top: -15px; right: -15px; width: 40px; height: 40px; 
             background: #ff3b30; color: white; border-radius: 50%; border: 2px solid white;
@@ -89,12 +70,6 @@
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
             width: 280px; height: 70px; display: none; z-index: 60;
             background-size: contain; background-repeat: no-repeat; background-position: center;
-        }
-
-        #error-screen {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #1a1a1a; z-index: 200; flex-direction: column; 
-            justify-content: center; align-items: center; color: white; text-align: center; padding: 20px;
         }
 
         @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
@@ -109,7 +84,7 @@
             <div id="sheet-content"></div>
             <div id="sheet-footer">
                 <div class="footer-text">
-                    <h2 id="campaign-title">Checking Campaign...</h2>
+                    <h2 id="campaign-title">Loading...</h2>
                     <p>Unlock the next level experience</p>
                 </div>
                 <button id="play-button">Play</button>
@@ -131,18 +106,11 @@
         </div>
     </div>
 
-    <div id="error-screen">
-        <div style="font-size: 50px;">⚠️</div>
-        <h2 id="error-title">Campaign Not Found</h2>
-        <p id="error-msg">The link might be expired or incorrect.</p>
-        <button onclick="location.reload()" style="margin-top:20px; padding:10px 25px; border-radius:20px; border:none; background:#4185f4; color:white; font-weight:bold;">Try Again</button>
-    </div>
-
-    <a href="#" target="_blank" id="buy-now-cta"></a>
+    <div id="buy-now-cta"></div>
 
     <a-scene 
         id="ar-scene"
-        mindar-image="autoStart: false; uiScanning: #none; filterMinCF: 0.00001; filterBeta: 0.001; missTolerance: 10;" 
+        mindar-image="autoStart: false; uiScanning: #none; filterMinCF: 0.000001; filterBeta: 0.0001; missTolerance: 15;" 
         device-orientation-permission-ui="enabled: false"
         vr-mode-ui="enabled: false"
         renderer="antialias: true; colorManagement: true; logarithmicDepthBuffer: true; precision: mediump;">
@@ -159,11 +127,10 @@
     </a-scene>
 
     <script>
-        const API_URL = "https://jsonmap.com/api/mock/artest";
+        const API_URL = "https://jsonmap.com/api/mock/artest_";
         
         const playBtn = document.querySelector('#play-button');
         const welcomePage = document.querySelector('#welcome-page');
-        const bottomSheet = document.querySelector('#bottom-sheet');
         const scannerUi = document.querySelector('#scanner-ui');
         const dynamicScannerImg = document.querySelector('#dynamic-scanner-img');
         const video = document.querySelector('#myVideo');
@@ -172,91 +139,47 @@
         const sceneEl = document.querySelector('#ar-scene');
         const arVideoRenderer = document.querySelector('#ar-video-renderer');
         const buyNowBtn = document.querySelector('#buy-now-cta');
-        const campaignTitle = document.querySelector('#campaign-title');
-        const errorScreen = document.querySelector('#error-screen');
+        const targetEntity = document.querySelector('#target-entity');
 
         let isStickyEnabled = true;
         let hasFoundOnce = false;
+        let lockedPosition = null;
 
         async function initCampaign() {
             try {
-                const urlParams = new URLSearchParams(window.location.search);
-                const targetId = urlParams.get('id');
-
                 const response = await fetch(API_URL);
-                if (!response.ok) throw new Error("API Failure");
                 const data = await response.json();
-                
-                let campaign;
-                if (targetId) campaign = data.find(item => item.id === targetId);
-                if (!campaign) campaign = data.find(item => item.is_active === true);
-
-                if (!campaign) {
-                    errorScreen.style.display = 'flex';
-                    return;
-                }
+                const campaign = data.find(item => item.is_active === true);
+                if (!campaign) return;
 
                 welcomePage.style.backgroundImage = `url('${campaign.welcomePoster}')`;
-                bottomSheet.style.backgroundImage = `url('${campaign.welcomePoster}')`;
-                campaignTitle.innerText = `Ready for ${campaign.campaignName}?`;
                 dynamicScannerImg.src = campaign.scannerImg;
                 video.src = campaign.videoUrl;
                 buyNowBtn.style.backgroundImage = `url('${campaign.CTAimgUrl}')`;
-                buyNowBtn.href = campaign.CTAredirectUrl;
-
-                // Configure MindAR before start
+                
                 sceneEl.setAttribute('mindar-image', {
                     imageTargetSrc: campaign.mindUrl,
                     autoStart: false,
                     uiScanning: '#none',
-                    filterMinCF: 0.00001,
-                    filterBeta: 0.001,
-                    missTolerance: 10
+                    filterMinCF: 0.000001,
+                    filterBeta: 0.0001
                 });
-
-                setTimeout(() => {
-                    playBtn.style.display = 'flex';
-                    playBtn.style.animation = 'fadeInRight 0.5s ease forwards';
-                }, 600);
-
-            } catch (err) {
-                console.error("Setup Error:", err);
-                errorScreen.style.display = 'flex';
-            }
+                playBtn.style.display = 'flex';
+            } catch (err) { console.error(err); }
         }
 
         window.addEventListener('load', initCampaign);
 
         playBtn.addEventListener('click', () => {
-            // Fix Black Screen: Remove background colors
-            document.body.style.backgroundColor = "transparent";
-            document.documentElement.style.backgroundColor = "transparent";
-            
-            // Interaction: Prep video and hide splash
-            video.play().then(() => video.pause()).catch(e => console.log(e));
             welcomePage.style.display = 'none';
             scannerUi.style.display = 'flex';
-            
-            // Start AR Engine
-            const startAR = () => {
-                const arSystem = sceneEl.systems["mindar-image-system"];
-                if (arSystem) {
-                    arSystem.start();
-                }
-            };
-
-            if (sceneEl.hasLoaded) {
-                startAR();
-            } else {
-                sceneEl.addEventListener('render-target-loaded', startAR);
-            }
+            sceneEl.systems["mindar-image-system"].start();
         });
-
-        const targetEntity = document.querySelector('#target-entity');
 
         targetEntity.addEventListener('targetFound', () => {
             hasFoundOnce = true;
             isStickyEnabled = true;
+            lockedPosition = null; 
             scannerUi.style.display = 'none';
             videoContainer.style.display = 'none';
             buyNowBtn.style.display = 'block';
@@ -264,7 +187,6 @@
             if(video.parentElement !== document.querySelector('a-assets')) {
                 document.querySelector('a-assets').appendChild(video);
             }
-            
             arVideoRenderer.setAttribute('visible', 'true');
             video.play();
         });
@@ -275,22 +197,36 @@
                 videoContainer.style.display = 'flex';
                 videoWrapper.appendChild(video);
                 video.play();
-            } else {
-                video.pause();
             }
         });
 
-        document.querySelector('#close-sticky').addEventListener('click', (e) => {
-            e.stopPropagation();
+        // REVOLUTIONARY LOCK & FRONT-FACING LOGIC
+        sceneEl.addEventListener('tick', () => {
+            if (targetEntity.object3D.visible && hasFoundOnce) {
+                if (!lockedPosition) {
+                    // Capture the stable world position
+                    lockedPosition = new THREE.Vector3();
+                    targetEntity.object3D.getWorldPosition(lockedPosition);
+                } else {
+                    // 1. Maintain the position pinned to the product
+                    const localPos = targetEntity.object3D.parent.worldToLocal(lockedPosition.clone());
+                    targetEntity.object3D.position.copy(localPos);
+                    
+                    // 2. FORCE FRONT-FACING & NO ROTATION
+                    // Resetting rotation to 0 0 0 makes the video parallel to the world axes (front facing)
+                    targetEntity.object3D.rotation.set(0, 0, 0);
+                    
+                    // 3. Optional: Ensure it faces camera perfectly (uncomment if you want billboard style)
+                    // targetEntity.object3D.quaternion.copy(sceneEl.camera.quaternion);
+                }
+            }
+        });
+
+        document.querySelector('#close-sticky').addEventListener('click', () => {
             isStickyEnabled = false;
             videoContainer.style.display = 'none';
             scannerUi.style.display = 'flex';
             video.pause();
-            document.querySelector('a-assets').appendChild(video);
-        });
-
-        document.addEventListener("visibilitychange", () => {
-            if (document.hidden) video.pause();
         });
     </script>
 </body>
