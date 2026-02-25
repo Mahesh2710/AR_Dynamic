@@ -1,179 +1,271 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>Haldiram AR - Locked Experience</title>
-    
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-    
-    <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: sans-serif; background: #000; }
-        .a-enter-vr, .a-enter-ar { display: none !important; }
+<meta charset="UTF-8" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Dynamic AR Experience - Stable</title>
 
-        #welcome-page {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 100; background: #1a1a1a center/cover;
-            display: flex; align-items: flex-end;
-        }
+<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
-        #bottom-sheet {
-            width: 100%; height: 45%; border-radius: 40px 40px 0 0; position: relative;
-            background: #121212 center/cover; transform: translateY(100%);
-            animation: slideUp 0.6s ease-out forwards;
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
-        }
+<style>
+body, html { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; font-family:'Segoe UI', sans-serif;}
+.a-enter-vr, .a-enter-ar { display:none !important; }
 
-        #play-button {
-            position: absolute; right: 30px; bottom: 30px;
-            width: 100px; height: 50px; background: #4185f4; border: none;
-            border-radius: 25px; color: white; font-weight: bold; cursor: pointer;
-            display: none; justify-content: center; align-items: center;
-        }
+#welcome-page{
+position:fixed; top:0; left:0; width:100%; height:100%;
+z-index:100; background-size:cover; background-position:center;
+display:flex; align-items:flex-end;
+}
 
-        #scanner-ui {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            display: none; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 50; pointer-events: none;
-        }
+#bottom-sheet{
+width:100%; height:50%; border-radius:40px 40px 0 0;
+background:#121212; transform:translateY(100%);
+animation:slideUp .8s forwards;
+display:flex; flex-direction:column;
+}
 
-        .scanner-frame { width: 70vw; height: 70vw; border: 2px solid rgba(163, 255, 0, 0.5); position: relative; border-radius: 20px; }
-        .scanner-line { position: absolute; width: 100%; height: 3px; background: #a3ff00; top: 0; animation: scan 2s linear infinite; }
-        
-        #video-container {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 80%; z-index: 40; display: none; 
-        }
+#sheet-content{ flex:1; padding:40px 30px; }
 
-        #video-wrapper { position: relative; width: 100%; border: 3px solid #FFF; border-radius: 15px; overflow: hidden; }
+#sheet-footer{
+background:#000; padding:20px 30px;
+display:flex; justify-content:space-between; align-items:center;
+}
 
-        #close-sticky {
-            position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; 
-            background: #ff3b30; color: white; border-radius: 50%; border: 1px solid white;
-            z-index: 100; display: flex; justify-content: center; align-items: center; font-size: 20px;
-        }
+#campaign-title{ color:#fff; margin:0; }
+#play-button{
+width:110px; height:50px; border-radius:25px;
+background:#4185f4; border:none; color:#fff;
+display:none; cursor:pointer;
+}
 
-        #buy-now-cta {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: 260px; height: 60px; display: none; z-index: 60;
-            background-size: contain; background-repeat: no-repeat; background-position: center;
-        }
+#scanner-ui{
+position:fixed; top:0; left:0; width:100%; height:100%;
+display:none; flex-direction:column; justify-content:center; align-items:center;
+z-index:50; color:#fff;
+}
 
-        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
-        @keyframes slideUp { to { transform: translateY(0); } }
-    </style>
+#video-container{
+position:fixed; top:50%; left:50%;
+transform:translate(-50%,-50%);
+width:85%; display:none; z-index:40;
+}
+
+#video-wrapper{ position:relative; width:100%; }
+#video-container video{
+width:100%; border-radius:20px; border:3px solid #fff;
+}
+
+#close-sticky{
+position:absolute; top:-15px; right:-15px;
+width:40px; height:40px; border-radius:50%;
+background:#ff3b30; color:#fff; border:2px solid #fff;
+font-size:22px; cursor:pointer;
+}
+
+#buy-now-cta{
+position:fixed; bottom:30px; left:50%;
+transform:translateX(-50%);
+width:280px; height:70px;
+display:none; z-index:60;
+background-size:contain; background-repeat:no-repeat;
+}
+
+#error-screen{
+display:none; position:fixed; top:0; left:0;
+width:100%; height:100%; background:#111;
+color:#fff; z-index:200;
+flex-direction:column; justify-content:center; align-items:center;
+}
+
+@keyframes slideUp{ to{ transform:translateY(0);} }
+</style>
 </head>
+
 <body>
 
-    <div id="welcome-page">
-        <div id="bottom-sheet">
-            <div style="padding: 30px; color: white;">
-                <h2 id="campaign-title" style="margin:0;">Loading Experience...</h2>
-                <p style="opacity: 0.7;">Keep your camera steady on the product.</p>
-            </div>
-            <button id="play-button">START</button>
-        </div>
-    </div>
+<div id="welcome-page">
+<div id="bottom-sheet">
+<div id="sheet-content"></div>
+<div id="sheet-footer">
+<h2 id="campaign-title">Checking Campaign...</h2>
+<button id="play-button">Play</button>
+</div>
+</div>
+</div>
 
-    <div id="scanner-ui">
-        <div class="scanner-frame">
-            <img id="dynamic-scanner-img" style="width:100%; opacity:0.4;">
-            <div class="scanner-line"></div>
-        </div>
-    </div>
+<div id="scanner-ui">SCAN THE PRODUCT</div>
 
-    <div id="video-container">
-        <div id="video-wrapper">
-            <button id="close-sticky">×</button>
-        </div>
-    </div>
+<div id="video-container">
+<div id="video-wrapper">
+<button id="close-sticky">×</button>
+</div>
+</div>
 
-    <a href="#" target="_blank" id="buy-now-cta"></a>
+<div id="error-screen">
+<h2>Campaign Not Found</h2>
+<button onclick="location.reload()">Try Again</button>
+</div>
 
-    <a-scene 
-        id="ar-scene"
-        mindar-image="autoStart: false; uiScanning: #none; filterMinCF: 0.00001; filterBeta: 999999; missTolerance: 60; warmupTolerance: 12;" 
-        device-orientation-permission-ui="enabled: false"
-        vr-mode-ui="enabled: false"
-        renderer="antialias: true; colorManagement: true; logarithmicDepthBuffer: true; precision: high;">
-        
-        <a-assets>
-            <video id="myVideo" loop="true" crossorigin="anonymous" playsinline webkit-playsinline preload="auto"></video>
-        </a-assets>
+<a href="#" target="_blank" id="buy-now-cta"></a>
 
-        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+<a-scene
+id="ar-scene"
+mindar-image="
+autoStart:false;
+uiScanning:#none;
+filterMinCF:0.0001;
+filterBeta:0.001;"
+device-orientation-permission-ui="enabled:false"
+vr-mode-ui="enabled:false"
+renderer="antialias:true; colorManagement:true; physicallyCorrectLights:false;"
+>
 
-        <a-entity mindar-image-target="targetIndex: 0" id="target-entity">
-            <a-video id="ar-video-renderer" src="#myVideo" width="1" height="1.8" position="0 0 0"></a-video>
-        </a-entity>
-    </a-scene>
+<a-assets>
+<video id="myVideo" loop playsinline webkit-playsinline crossorigin="anonymous"></video>
+</a-assets>
 
-    <script>
-        const API_URL = "https://jsonmap.com/api/mock/artest";
-        const video = document.querySelector('#myVideo');
-        const sceneEl = document.querySelector('#ar-scene');
+<a-camera position="0 0 0" look-controls="enabled:false"></a-camera>
 
-        async function initCampaign() {
-            try {
-                const urlParams = new URLSearchParams(window.location.search);
-                const targetId = urlParams.get('id');
-                const ts = Date.now();
+<a-entity id="target-entity"
+mindar-image-target="targetIndex:0"
+ultra-smooth>
 
-                const response = await fetch(`${API_URL}?t=${ts}`);
-                const data = await response.json();
-                
-                let campaign = data.find(item => item.id === targetId) || data.find(item => item.is_active);
-                if (!campaign) return;
+<a-video
+id="ar-video-renderer"
+src="#myVideo"
+width="1"
+height="1.8"
+position="0 0 0.01"
+material="shader:flat;">
+</a-video>
 
-                // Content Injection
-                document.querySelector('#welcome-page').style.backgroundImage = `url('${campaign.welcomePoster}?v=${ts}')`;
-                document.querySelector('#bottom-sheet').style.backgroundImage = `url('${campaign.welcomePoster}?v=${ts}')`;
-                document.querySelector('#campaign-title').innerText = campaign.campaignName;
-                document.querySelector('#dynamic-scanner-img').src = `${campaign.scannerImg}?v=${ts}`;
-                video.src = `${campaign.videoUrl}?v=${ts}`;
-                document.querySelector('#buy-now-cta').style.backgroundImage = `url('${campaign.CTAimgUrl}?v=${ts}')`;
-                document.querySelector('#buy-now-cta').href = campaign.CTAredirectUrl;
+</a-entity>
+</a-scene>
 
-                // Apply the "STUCK" filter parameters
-                const mindFile = `${campaign.mindUrl}?v=${ts}`;
-                sceneEl.setAttribute('mindar-image', `imageTargetSrc: ${mindFile}; autoStart: false; uiScanning: #none; filterMinCF: 0.00001; filterBeta: 999999; missTolerance: 60; warmupTolerance: 12;`);
+<script>
+const API_URL="https://jsonmap.com/api/mock/artest";
 
-                document.querySelector('#play-button').style.display = 'flex';
-            } catch (err) { console.error(err); }
-        }
+const playBtn=document.querySelector('#play-button');
+const welcomePage=document.querySelector('#welcome-page');
+const scannerUi=document.querySelector('#scanner-ui');
+const video=document.querySelector('#myVideo');
+const videoContainer=document.querySelector('#video-container');
+const videoWrapper=document.querySelector('#video-wrapper');
+const sceneEl=document.querySelector('#ar-scene');
+const buyNowBtn=document.querySelector('#buy-now-cta');
+const campaignTitle=document.querySelector('#campaign-title');
+const errorScreen=document.querySelector('#error-screen');
 
-        window.addEventListener('load', initCampaign);
+let isStickyEnabled=true;
+let hasFoundOnce=false;
 
-        document.querySelector('#play-button').addEventListener('click', () => {
-            video.play().then(() => video.pause());
-            document.querySelector('#welcome-page').style.display = 'none';
-            document.querySelector('#scanner-ui').style.display = 'flex';
-            sceneEl.systems["mindar-image-system"].start();
-        });
+/* ===============================
+   ULTRA SMOOTH COMPONENT
+================================ */
+AFRAME.registerComponent('ultra-smooth',{
+init:function(){
+this.pos=new THREE.Vector3();
+this.quat=new THREE.Quaternion();
+},
+tick:function(){
+const obj=this.el.object3D;
+this.pos.lerp(obj.position,0.07);
+obj.position.copy(this.pos);
+this.quat.slerp(obj.quaternion,0.07);
+obj.quaternion.copy(this.quat);
+}
+});
 
-        const target = document.querySelector('#target-entity');
-        target.addEventListener('targetFound', () => {
-            document.querySelector('#scanner-ui').style.display = 'none';
-            document.querySelector('#buy-now-cta').style.display = 'block';
-            document.querySelector('#video-container').style.display = 'none';
-            document.querySelector('a-assets').appendChild(video);
-            video.play();
-        });
+/* ===============================
+   INIT CAMPAIGN
+================================ */
+async function initCampaign(){
+try{
+const response=await fetch(API_URL);
+if(!response.ok) throw new Error();
+const data=await response.json();
+const campaign=data.find(c=>c.is_active===true);
+if(!campaign){ errorScreen.style.display='flex'; return; }
 
-        target.addEventListener('targetLost', () => {
-            document.querySelector('#video-container').style.display = 'flex';
-            document.querySelector('#video-wrapper').appendChild(video);
-            video.play();
-        });
+welcomePage.style.backgroundImage=`url('${campaign.welcomePoster}')`;
+campaignTitle.innerText=`Ready for ${campaign.campaignName}?`;
+video.src=campaign.videoUrl;
+buyNowBtn.style.backgroundImage=`url('${campaign.CTAimgUrl}')`;
+buyNowBtn.href=campaign.CTAredirectUrl;
 
-        document.querySelector('#close-sticky').addEventListener('click', () => {
-            document.querySelector('#video-container').style.display = 'none';
-            video.pause();
-        });
-    </script>
+sceneEl.setAttribute('mindar-image',
+`imageTargetSrc:${campaign.mindUrl};
+autoStart:false;
+uiScanning:#none;
+filterMinCF:0.0001;
+filterBeta:0.001;`);
+
+setTimeout(()=>playBtn.style.display='block',600);
+}catch(e){
+errorScreen.style.display='flex';
+}
+}
+
+window.addEventListener('load',initCampaign);
+
+/* ===============================
+   PLAY BUTTON
+================================ */
+playBtn.addEventListener('click',()=>{
+video.play().then(()=>video.pause()).catch(()=>{});
+welcomePage.style.display='none';
+scannerUi.style.display='flex';
+
+if(sceneEl.hasLoaded){
+sceneEl.systems["mindar-image-system"].start();
+}else{
+sceneEl.addEventListener('loaded',()=>{
+sceneEl.systems["mindar-image-system"].start();
+});
+}
+});
+
+/* ===============================
+   TARGET EVENTS
+================================ */
+const target=document.querySelector('#target-entity');
+
+target.addEventListener('targetFound',()=>{
+hasFoundOnce=true;
+isStickyEnabled=true;
+scannerUi.style.display='none';
+videoContainer.style.display='none';
+buyNowBtn.style.display='block';
+document.querySelector('a-assets').appendChild(video);
+video.play();
+});
+
+target.addEventListener('targetLost',()=>{
+if(hasFoundOnce && isStickyEnabled){
+videoContainer.style.display='flex';
+videoWrapper.appendChild(video);
+video.play();
+}else{
+video.pause();
+}
+});
+
+document.querySelector('#close-sticky').addEventListener('click',()=>{
+isStickyEnabled=false;
+videoContainer.style.display='none';
+scannerUi.style.display='flex';
+video.pause();
+document.querySelector('a-assets').appendChild(video);
+});
+
+document.addEventListener("visibilitychange",()=>{
+if(document.hidden) video.pause();
+});
+</script>
+
 </body>
 </html>
