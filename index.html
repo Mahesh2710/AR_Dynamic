@@ -5,7 +5,7 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>Dynamic AR Experience - Scale & Rotation Fixed</title>
+    <title>Dynamic AR Experience - Absolute Front Facing</title>
     
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
@@ -147,22 +147,25 @@
             <video id="myVideo" loop="true" crossorigin="anonymous" playsinline webkit-playsinline preload="auto"></video>
         </a-assets>
 
-        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+        <a-camera position="0 0 0" look-controls="enabled: false" wasd-controls="enabled: false"></a-camera>
 
         <a-entity mindar-image-target="targetIndex: 0" id="target-entity">
-            <a-video id="ar-video-renderer" src="#myVideo" position="0 0 0.1" force-front-facing></a-video>
+            <a-video id="ar-video-renderer" src="#myVideo" force-front-facing></a-video>
         </a-entity>
     </a-scene>
 
     <script>
-        // TRUE LOCK: Disables AR-based rotation and scaling
+        // ABSOLUTE LOCK: Prevents MindAR from scaling, rotating, or offsetting the video
         AFRAME.registerComponent('force-front-facing', {
             tick: function () {
-                // Lock rotation to screen flat
+                // Stay flat against the camera lens
                 this.el.object3D.quaternion.set(0, 0, 0, 1);
                 
-                // Lock scale to 1:1 (Ignores camera distance)
+                // Force fixed size (ignores distance from camera)
                 this.el.object3D.scale.set(1, 1, 1);
+
+                // Keep perfectly centered on the target anchor
+                this.el.object3D.position.set(0, 0, 0.1);
             }
         });
 
