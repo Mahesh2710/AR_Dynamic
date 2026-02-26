@@ -5,7 +5,7 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>Dynamic AR Experience - Front Facing Fixed</title>
+    <title>Dynamic AR Experience - 3D Text Edition</title>
     
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
@@ -19,20 +19,20 @@
         }
         .a-enter-vr, .a-enter-ar { display: none !important; }
 
+        /* Welcome Page with Static Poster */
         #welcome-page {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 100; 
-            /* Added Static URL */
             background-image: url('https://raw.githubusercontent.com/Mahesh2710/ARData/main/DynamicData/poster/welcomeposter.png');
             background-size: cover; background-position: center;
             display: flex; align-items: flex-end;
         }
 
+        /* Bottom Sheet with Static Image and Forced Fit */
         #bottom-sheet {
             width: 100%; height: 50%; border-radius: 40px 40px 0 0; position: relative;
             display: flex; flex-direction: column; overflow: hidden;
             box-shadow: 0 -15px 35px rgba(0,0,0,0.6);
-            /* Added Static URL and forced fit */
             background-image: url('https://raw.githubusercontent.com/Mahesh2710/ARData/main/DynamicData/poster/welcome.png');
             background-size: 100% 100%; 
             background-repeat: no-repeat;
@@ -43,8 +43,7 @@
 
         #sheet-content {
             flex: 1; padding: 40px 30px;
-            /* Subtler gradient to show more of the background image */
-            background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%);
+            background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 100%);
             display: flex; flex-direction: column; justify-content: center;
         }
 
@@ -53,15 +52,16 @@
             justify-content: space-between; align-items: center; border-top: 2px solid #FFF;
         }
 
-        /* ... remaining styles stay the same ... */
         .footer-text h2 { color: white; margin: 0; font-size: 1.2rem; }
         .footer-text p { color: #888; margin: 5px 0 0 0; font-size: 0.9rem; }
+
         #play-button {
             width: 110px; height: 50px; background: #4185f4; border: none;
             border-radius: 25px; cursor: pointer; display: none;
             justify-content: center; align-items: center; color: white; font-weight: bold;
             box-shadow: 0 4px 15px rgba(65, 133, 244, 0.4);
         }
+
         #scanner-ui {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             display: none; flex-direction: column; justify-content: center; align-items: center;
@@ -70,6 +70,7 @@
         .scanner-frame { width: 75vw; height: 75vw; position: relative; display: flex; justify-content: center; align-items: center; }
         .scanner-img { width: 70%; opacity: 0.6; }
         .scanner-line { position: absolute; width: 100%; height: 4px; background: #a3ff00; top: 0; animation: scan 2s linear infinite; }
+        
         #video-container {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 85%; z-index: 40; display: none; 
@@ -77,22 +78,26 @@
         }
         #video-wrapper { position: relative; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.8); border-radius: 20px; }
         #video-container video { width: 100%; border: 3px solid #FFF; border-radius: 20px; display: block; }
+
         #close-sticky {
             position: absolute; top: -15px; right: -15px; width: 40px; height: 40px; 
             background: #ff3b30; color: white; border-radius: 50%; border: 2px solid white;
             font-size: 24px; font-weight: bold; cursor: pointer; z-index: 100;
             display: flex; justify-content: center; align-items: center;
         }
+
         #buy-now-cta {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
             width: 280px; height: 70px; display: none; z-index: 60;
             background-size: contain; background-repeat: no-repeat; background-position: center;
         }
+
         #error-screen {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: #1a1a1a; z-index: 200; flex-direction: column; 
             justify-content: center; align-items: center; color: white; text-align: center; padding: 20px;
         }
+
         @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
         @keyframes slideUp { to { transform: translateY(0); } }
         @keyframes fadeInRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
@@ -150,18 +155,31 @@
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
         <a-entity mindar-image-target="targetIndex: 0" id="target-entity">
+            <a-text 
+                id="ar-text-ui" 
+                value="" 
+                align="center" 
+                color="#FFFFFF" 
+                negate="false"
+                scale="0.8 0.8 0.8"
+                position="0 1.25 0.1" 
+                font="https://cdn.aframe.io/fonts/DejaVu-sdf.fnt"
+                force-front-facing>
+            </a-text>
+
             <a-video id="ar-video-renderer" src="#myVideo" position="0 0 0.1" force-front-facing></a-video>
         </a-entity>
-    </a-scene>
+    </-scene>
 
     <script>
+        // Custom Component: Keeps entity rotation fixed to the screen
         AFRAME.registerComponent('force-front-facing', {
             tick: function () {
                 this.el.object3D.quaternion.set(0, 0, 0, 1);
             }
         });
 
-        const API_URL = "https://akm-img-a-in.tosshub.com/app/at-app/at_dev/newicons/AR_expierence.json#";
+        const API_URL = "https://jsonmap.com/api/mock/artest";
         
         const playBtn = document.querySelector('#play-button');
         const welcomePage = document.querySelector('#welcome-page');
@@ -173,6 +191,7 @@
         const videoWrapper = document.querySelector('#video-wrapper');
         const sceneEl = document.querySelector('#ar-scene');
         const arVideoRenderer = document.querySelector('#ar-video-renderer');
+        const arTextUI = document.querySelector('#ar-text-ui');
         const buyNowBtn = document.querySelector('#buy-now-cta');
         const campaignTitle = document.querySelector('#campaign-title');
         const errorScreen = document.querySelector('#error-screen');
@@ -196,6 +215,7 @@
                     return;
                 }
 
+                // Load video and handle aspect ratio
                 video.src = campaign.videoUrl;
                 video.load();
                 video.onloadedmetadata = () => {
@@ -205,8 +225,11 @@
                     arVideoRenderer.setAttribute('height', baseHeight);
                 };
 
-                // NOTE: background images for welcome-page and bottom-sheet are now handled via CSS
+                // Update UI text
                 campaignTitle.innerText = `Ready for ${campaign.campaignName}?`;
+                arTextUI.setAttribute('value', campaign.campaignName.toUpperCase());
+                
+                // Update images
                 dynamicScannerImg.src = campaign.scannerImg;
                 buyNowBtn.style.backgroundImage = `url('${campaign.CTAimgUrl}')`;
                 buyNowBtn.href = campaign.CTAredirectUrl;
@@ -261,12 +284,14 @@
             }
             
             arVideoRenderer.setAttribute('visible', 'true');
+            arTextUI.setAttribute('visible', 'true');
             video.play();
         });
 
         targetEntity.addEventListener('targetLost', () => {
             if (hasFoundOnce && isStickyEnabled) {
                 arVideoRenderer.setAttribute('visible', 'false');
+                arTextUI.setAttribute('visible', 'false');
                 videoContainer.style.display = 'flex';
                 videoWrapper.appendChild(video);
                 video.play();
