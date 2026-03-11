@@ -33,7 +33,7 @@
         // ── 1. MR Launch (page load = invoke count) ──────────────────────────────
         // Covers: Total MR Launches, Entry Source Split via UTM params
         const urlParams  = new URLSearchParams(window.location.search);
-        window._logEvent('mr_launch', {
+        window._logEvent('ar_launch', {
             campaign_id:     urlParams.get('id')     || 'unknown',
             utm_source:      urlParams.get('utm_source')   || 'direct',
             utm_medium:      urlParams.get('utm_medium')   || 'none',
