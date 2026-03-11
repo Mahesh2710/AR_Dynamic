@@ -15,6 +15,8 @@
     <link rel="dns-prefetch" href="https://cdn.aframe.io">
 
     <!-- Welcome poster preload injected dynamically after campaign JSON loads -->
+    <link rel="preload" as="image" href="https://raw.githubusercontent.com/Mahesh2710/ARData/main/DynamicData/poster/welcomeposter.png" fetchpriority="high">
+    <link rel="preload" as="image" href="https://raw.githubusercontent.com/Mahesh2710/ARData/main/DynamicData/poster/welcome.png">
 
     <style>
         body, html { 
@@ -27,6 +29,7 @@
         #welcome-page {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 100; 
+            background-image: url('https://raw.githubusercontent.com/Mahesh2710/ARData/main/DynamicData/poster/welcomeposter.png');
             background-size: cover; background-position: center;
             display: flex; align-items: flex-end;
         }
@@ -35,6 +38,7 @@
             width: 100%; height: 50%; border-radius: 40px 40px 0 0; position: relative;
             display: flex; flex-direction: column; overflow: hidden;
             box-shadow: 0 -15px 35px rgba(0,0,0,0.6);
+            background-image: url('https://raw.githubusercontent.com/Mahesh2710/ARData/main/DynamicData/poster/welcome.png');
             background-size: 100% 100%; 
             background-repeat: no-repeat;
             background-position: center;
@@ -234,11 +238,6 @@
                 campaignData = campaign;
                 campaignTitle.innerText = 'ExpRE';
                 dynamicScannerImg.src   = campaign.scannerImg;
-
-                // Set welcome poster from JSON
-                if (campaign.welcomePoster) {
-                    welcomePage.style.backgroundImage = `url('${campaign.welcomePoster}')`;
-                }
 
                 // Set CTA — use clickTrackerUrl from JSON if available, else fall back to CTAredirectUrl directly
                 if (campaign.CTAimgUrl) {
